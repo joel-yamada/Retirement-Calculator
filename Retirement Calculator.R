@@ -1,31 +1,16 @@
 # Title: Retirement Contribution Calculator
 # Description: This calculates how much money you could accumulate in your employer retirement plan (or other similar retirement account) over time by making periodic contributions from each paycheck.
-# Author: Joel Yamada
-# Date: 10/31/2023
-
 
 # =======================================================
-# Packages (you can use other packages if you want)
+# Packages
 # =======================================================
 library(shiny)
 library(tidyverse) # for data manipulation and graphics
 library(plotly)    # for web-interactive graphics
 library(DT)        # to work with HTML table widgets
 
-
-# ======================================================
-# Auxiliary objects/functions 
-# (that don't depend on input widgets)
-# ======================================================
-# You may want to add one or more auxiliary objects for your analysis
-# (by "auxiliary" we mean anything that doesn't depend on input widgets)
-
-
-
-
-
 # =======================================================
-# Define UI for application
+# UI
 # =======================================================
 ui <- fluidPage(
   
@@ -63,7 +48,7 @@ ui <- fluidPage(
       checkboxInput(inputId = "showTarget",
                    label = "Show target amount:",
                    value = FALSE),
-    ),  # closes sidebarPanel of inputs
+    ),  
     
     # -------------------------------------------------------
     # Main Panel with outputs: plots and table
@@ -79,18 +64,17 @@ ui <- fluidPage(
       dataTableOutput(outputId = "table"),
     )
     
-  ) # closes sidebarLayout
-) # closes fluidPage (UI)
+  ) 
+)
 
 
 # ======================================================
-# Define server logic
+# Server logic
 # ======================================================
 server <- function(input, output) {
   
   # ------------------------------------------------------------
   # Reactive Balance table
-  # (adapt code to get the appropriate Balance data table)
   # ------------------------------------------------------------
   tbl = reactive({
     balance_tbl = data.frame(
@@ -137,7 +121,6 @@ server <- function(input, output) {
   
   # ------------------------------------------------------------
   # Plot of balance timeline
-  # (adapt code to make a timeline according to your analysis)
   # ------------------------------------------------------------
   output$plot1 <- renderPlotly({
     # the following code is for demo purposes only; adapt it!!!
@@ -154,14 +137,12 @@ server <- function(input, output) {
                           linetype = "solid")
     }
     
-    # Return the plot
     p
   })
   
   # ------------------------------------------------------------
   # Plot of balance decomposition
-  # (adapt code to make a graphic according to your analysis)
-  # ------------------------------------------------------------``
+  # ------------------------------------------------------------
   output$plot2 <- renderPlotly({
     
     tbl = pivot_longer(
@@ -179,14 +160,10 @@ server <- function(input, output) {
   
   # ------------------------------------------------------------
   # Table with Retirement Balance data
-  # (adapt code to display appropriate table)
   # ------------------------------------------------------------
   output$table <- renderDataTable({
-    # to limit the number of decimal digits in the rendered table
-    # you can convert it into a "DataTable" object, and then use
-    # formatRound() to limit the displayed decimals.
     tbl() |>
-      datatable() |> # convert into "DataTable" object
+      datatable() |> 
       formatRound(columns = c("annual_contrib", 
                               "period_contrib", 
                               "balance", 
@@ -195,12 +172,12 @@ server <- function(input, output) {
                               "own_pct", 
                               "growth", 
                               "growth_pct"), 
-                  digits = 2) # round to 2-digits
+                  digits = 2) 
   })
   
- 
-} # closes server
+}
 
-
+#----------------------
 # Run the application 
+#----------------------
 shinyApp(ui = ui, server = server)
