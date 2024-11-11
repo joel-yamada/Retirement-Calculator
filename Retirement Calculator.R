@@ -22,7 +22,6 @@ ui <- fluidPage(
   # -------------------------------------------------------
   sidebarLayout(
     sidebarPanel(
-      # inputs
       numericInput(inputId = "annualSalary",
                   label = "Annual salary:",
                   value = 80000),
@@ -48,10 +47,10 @@ ui <- fluidPage(
       checkboxInput(inputId = "showTarget",
                    label = "Show target amount:",
                    value = FALSE),
-    ),  
+    ), 
     
     # -------------------------------------------------------
-    # Main Panel with outputs: plots and table
+    # Main Panel
     # -------------------------------------------------------
     mainPanel(
       h3("Balance Timeline"),
@@ -64,7 +63,7 @@ ui <- fluidPage(
       dataTableOutput(outputId = "table"),
     )
     
-  ) 
+  )
 )
 
 
@@ -97,7 +96,7 @@ server <- function(input, output) {
       if (y == 1) {
         for (i in 0:(as.numeric(input$numberOfperiods) - 1)) {
           balance_tbl$balance[y] = balance_tbl$balance[y] + balance_tbl$period_contrib[y]*(1 + input$annualRateofReturn/as.numeric(input$numberOfperiods)) ** i
-        } # 12449.93
+        }
       }
     }
     
@@ -123,7 +122,7 @@ server <- function(input, output) {
   # Plot of balance timeline
   # ------------------------------------------------------------
   output$plot1 <- renderPlotly({
-    # the following code is for demo purposes only; adapt it!!!
+    
     p <- ggplot(data = tbl(), aes(x = year, y = balance)) +
       geom_line(color = "black") +
       geom_point(color = "black") + 
@@ -145,15 +144,15 @@ server <- function(input, output) {
   # ------------------------------------------------------------
   output$plot2 <- renderPlotly({
     
-    tbl = pivot_longer(
-      data = tbl(),
-      cols = own:growth,
-      names_to = "type")
+    tbl_data <- tbl()
     
-    ggplot(data = tbl,
-           aes(x = year,
-               y = value,
-               fill = type)) +
+    tbl = pivot_longer(
+      data = tbl_data,
+      cols = own:growth,
+      names_to = "type",
+      values_to = "value")
+    
+    ggplot(data = tbl, aes(x = year, y = value)) +
       geom_col()
   })
 
@@ -162,8 +161,9 @@ server <- function(input, output) {
   # Table with Retirement Balance data
   # ------------------------------------------------------------
   output$table <- renderDataTable({
+
     tbl() |>
-      datatable() |> 
+      datatable() |> # convert into "DataTable" object
       formatRound(columns = c("annual_contrib", 
                               "period_contrib", 
                               "balance", 
@@ -172,12 +172,11 @@ server <- function(input, output) {
                               "own_pct", 
                               "growth", 
                               "growth_pct"), 
-                  digits = 2) 
+                  digits = 2) # round to 2-digits
   })
   
-}
+} 
 
-#----------------------
+
 # Run the application 
-#----------------------
 shinyApp(ui = ui, server = server)
